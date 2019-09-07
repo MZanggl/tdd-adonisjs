@@ -34,6 +34,10 @@ class User extends Model {
   tokens () {
     return this.hasMany('App/Models/Token')
   }
+
+  threads() {
+    return this.hasMany('App/Models/Thread')
+  }
 }
 
 module.exports = User

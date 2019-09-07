@@ -16,4 +16,4 @@
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
 const Route = use('Route')
 
-Route.resource('threads', 'ThreadController').only(['store', 'destroy'])
+Route.resource('threads', 'ThreadController').only(['store', 'destroy']).middleware('auth')

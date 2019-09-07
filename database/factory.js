@@ -14,15 +14,18 @@
 /** @type {import('@adonisjs/lucid/src/Factory')} */
 const Factory = use('Factory')
 
-// Factory.blueprint('App/Models/User', (faker) => {
-//   return {
-//     username: faker.username()
-//   }
-// })
+Factory.blueprint('App/Models/User', (faker) => {
+  return {
+    username: faker.username(),
+    email: faker.email(),
+    password: '123456',
+  }
+})
 
-Factory.blueprint('App/Models/Thread', (faker) => {
+Factory.blueprint('App/Models/Thread', async (faker) => {
   return {
     title: faker.word(),
     body: faker.paragraph(),
+    user_id: (await Factory.model('App/Models/User').create()).id
   }
 })
