@@ -8,9 +8,15 @@ class ThreadController {
         return response.json({ thread })
     }
 
-    async destroy({ params }) {
+    async update({ request, params, response }) {
         const thread = await Thread.findOrFail(params.id)
-        await thread.delete()
+        thread.merge(request.only(['title', 'body']))
+        await thread.save()
+        return response.json({ thread })
+    }
+
+    async destroy({ params }) {
+        await Thread.query().where('id', params.id).delete()
     }
 }
 
