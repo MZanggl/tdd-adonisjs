@@ -45,6 +45,14 @@ test('authorized user can delete threads', async ({ assert, client }) => {
   assert.equal(await Thread.getCount(), 0)
 })
 
+test('moderator can delete threads', async ({ assert, client }) => {
+  const moderator = await Factory.model('App/Models/User').create({ type: 1 })
+  const thread = await Factory.model('App/Models/Thread').create()
+  const response = await client.delete(thread.url()).send().loginVia(moderator).end()
+  response.assertStatus(204)
+  assert.equal(await Thread.getCount(), 0)
+})
+
 test('thread can not be deleted by a user who did not create it', async ({ client }) => {
   const thread = await Factory.model('App/Models/Thread').create()
   const notOwner = await Factory.model('App/Models/User').create()
@@ -76,6 +84,15 @@ test('authorized user can update title and body of threads', async ({ assert, cl
   response.assertStatus(200)
   response.assertJSON({ thread: thread.toJSON() })
   assert.deepEqual(thread.toJSON(), updatedThreadAttributes)
+})
+
+test('moderator can update title and body of threads', async ({ assert, client }) => {
+  const thread = await Factory.model('App/Models/Thread').create()
+  const moderator = await Factory.model('App/Models/User').create({ type: 1})
+  const attributes = { title: 'new title', body: 'new body' }
+
+  const response = await client.put(thread.url()).loginVia(moderator).send(attributes).end()
+  response.assertStatus(200)
 })
 
 test('can not create thread with no body or title', async ({ client }) => {
