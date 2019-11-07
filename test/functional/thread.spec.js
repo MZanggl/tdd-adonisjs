@@ -1,12 +1,25 @@
 'use strict'
 
-const { test, trait } = use('Test/Suite')('Thread')
+const { test, trait, before, after } = use('Test/Suite')('Thread')
+const { ioc } = use('@adonisjs/fold')
 const Thread = use('App/Models/Thread')
 const Factory = use('Factory')
 
 trait('Test/ApiClient')
 trait('Auth/Client')
 trait('DatabaseTransactions')
+
+before(() => {
+  ioc.fake('App/Services/ProfanityGuard', () => {
+    return {
+      handle: value => value !== 'jackass'
+    }
+  })
+})
+
+after(() => {
+  ioc.restore('App/Services/ProfanityGuard')
+})
 
 test('authorized user can create threads', async ({ client }) => {
   const user = await Factory.model('App/Models/User').create()
@@ -20,6 +33,13 @@ test('authorized user can create threads', async ({ client }) => {
   const thread = await Thread.firstOrFail()
   response.assertJSON({ thread: thread.toJSON() })
   response.assertJSONSubset({ thread: { ...attributes, user_id: user.id } })
+})
+
+test('user can not create thread where title contains profanities', async ({ client }) => {
+  const user = await Factory.model('App/Models/User').create()
+  const attributes = { title: 'jackass', body: 'body' }
+  const response = await client.post('/threads').loginVia(user).send(attributes).end()
+  response.assertStatus(400)
 })
 
 test('unauthenticated user cannot create threads', async ({ client }) => {

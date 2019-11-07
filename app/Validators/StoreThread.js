@@ -3,7 +3,7 @@
 class StoreThread {
   get rules () {
     return {
-      title: 'required', 
+      title: 'required|profanity', 
       body: 'required'
     }
   }
