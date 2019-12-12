@@ -12,8 +12,14 @@
 
 // Uncomment when want to run migrations
 const ace = require('@adonisjs/ace')
+const Factory = use('Factory')
 
 module.exports = (cli, runner) => {
+
+  global.factory = (model) => {
+    return Factory.model(model)
+  }
+
   runner.before(async () => {
     /*
     |--------------------------------------------------------------------------

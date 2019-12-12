@@ -3,7 +3,6 @@
 const { test, trait, before, after } = use('Test/Suite')('Thread')
 const { ioc } = use('@adonisjs/fold')
 const Thread = use('App/Models/Thread')
-const Factory = use('Factory')
 
 trait('Test/ApiClient')
 trait('Auth/Client')
@@ -22,7 +21,7 @@ after(() => {
 })
 
 test('authorized user can create threads', async ({ client }) => {
-  const user = await Factory.model('App/Models/User').create();
+  const user = await factory('App/Models/User').create();
   const attributes = {
     title: 'test title',
     body: 'body',
@@ -35,7 +34,7 @@ test('authorized user can create threads', async ({ client }) => {
 })
 
 test('user can not create thread where title contains profanities', async ({ client }) => {
-  const user = await Factory.model('App/Models/User').create();
+  const user = await factory('App/Models/User').create();
   const attributes = { title: 'jackass', body: 'body' };
   const response = await client.post('/threads').loginVia(user).send(attributes).end();
   response.assertStatus(400);
@@ -50,7 +49,7 @@ test('unauthenticated user cannot create threads', async ({ client }) => {
 })
 
 test('can not create thread with no body or title', async ({ client }) => {
-  const user = await Factory.model('App/Models/User').create();
+  const user = await factory('App/Models/User').create();
   let response = await client.post('/threads').header('accept', 'application/json').loginVia(user).send({ title: 'test title' }).end();
   response.assertStatus(400);
   response.assertJSONSubset([{ message: 'required validation failed on body' }]);
